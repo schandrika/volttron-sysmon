@@ -47,13 +47,9 @@ from os import path, walk, access, R_OK
 from collections import namedtuple
 from gevent import sleep
 
-# TODO from volttron import platform  # Used to get VOLTTRON version #.
 from volttron.client.vip.agent import Agent, RPC
+from volttron.utils.scheduling import periodic
 from volttron import utils
-
-# if int(platform.__version__.split('.')[0]) >= 6:
-#     from volttron.platform.scheduling import periodic
-
 
 utils.setup_logging()
 _log = logging.getLogger(__name__)
