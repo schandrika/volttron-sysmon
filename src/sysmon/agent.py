@@ -47,11 +47,12 @@ from os import path, walk, access, R_OK
 from collections import namedtuple
 from gevent import sleep
 
-from volttron import platform  # Used to get VOLTTRON version #.
-from volttron.platform.vip.agent import Agent, RPC
-from volttron.platform.agent import utils
-if int(platform.__version__.split('.')[0]) >= 6:
-    from volttron.platform.scheduling import periodic
+# TODO from volttron import platform  # Used to get VOLTTRON version #.
+from volttron.client.vip.agent import Agent, RPC
+from volttron import utils
+
+# if int(platform.__version__.split('.')[0]) >= 6:
+#     from volttron.platform.scheduling import periodic
 
 
 utils.setup_logging()
@@ -186,7 +187,9 @@ class SysMonAgent(Agent):
         # Start Monitors:
         sleep(1)  # Wait for a second to pass to avoid divide by zero errors from tracking variables.
         for method in self.IMPLEMENTED_METHODS:
+            print("monitors", monitors)
             item = monitors.pop(method, None)
+            print("item", item)
             if method == 'path_usage_rate' and item.get('path_name', None):
                 # Set initial value(s) of self.last_path_sizes for any configured path names.
                 self.path_usage_rate(item.get('path_name'))
@@ -264,8 +267,9 @@ class SysMonAgent(Agent):
             pub_wrapper = _datalogger_publish
         else:
             pub_wrapper = _all_type_publish
-        if int(platform.__version__.split('.')[0]) >= 6:  # TODO: Deprecated self.core.periodic required to support VOLTTRON < 6.
-            sched = self.core.schedule(periodic(check_interval), pub_wrapper, params)
+        if False: #int(get_version.__version__.split('.')[0]) >= 6:  # TODO: Deprecated self.core.periodic required to support VOLTTRON < 6.
+            pass
+            # sched = self.core.schedule(periodic(check_interval), pub_wrapper, params)
         else:
             sched = self.core.periodic(check_interval, pub_wrapper, kwargs={'parameters': params})
         self._scheduled.append(sched)
