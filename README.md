@@ -393,7 +393,7 @@ for the resource utilization statistics and publish it to the message bus using 
 message content for each publish will contain only a single numeric value for that specific topic.  Currently,
 “scrape_all” style publishes are not supported.
 
-The following are example publishes as captured by the Listener agent into the VOLTTRON log:
+The following is an example of the LoadAverage publish captured by the Listener agent in the VOLTTRON log:
 
 ```
 2024-01-02 12:03:50,435 (volttron-listener-0.2.0rc0 2404) listener.agent(104) INFO: Peer: pubsub, Sender: volttron-sysmon-0.1.0_1:, Bus: , Topic: datalogger/Log/Platform/CPU/LoadAverage, Headers: {'Date': '2024-01-02T20:03:50.426814+00:00', 'min_compatible_version': '3.0', 'max_compatible_version': ''}, Message:
