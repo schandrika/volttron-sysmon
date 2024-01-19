@@ -42,14 +42,14 @@
 
 import logging
 import sys
-import psutil
-from os import path, walk, access, R_OK
 from collections import namedtuple
-from gevent import sleep
+from os import R_OK, access, path, walk
 
-from volttron.client.vip.agent import Agent, RPC
-from volttron.utils.scheduling import periodic
+import psutil
+from gevent import sleep
 from volttron import utils
+from volttron.client.vip.agent import RPC, Agent
+from volttron.utils.scheduling import periodic
 
 utils.setup_logging()
 _log = logging.getLogger(__name__)
