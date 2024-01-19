@@ -4,14 +4,14 @@ The System Monitoring Agent (colloquially “SysMon”) can be installed on the 
 including percent CPU utilization, percent system memory (RAM) utilization, and percent storage (disk) utilization based
 on disk path.
 
-# Prerequisites
+## Prerequisites
 
-* Python 3.8
+* Python 3.10
 
 ## Python
 
 <details>
-<summary>To install Python 3.8, we recommend using <a href="https://github.com/pyenv/pyenv"><code>pyenv</code></a>.</summary>
+<summary>To install Python 3.10, we recommend using <a href="https://github.com/pyenv/pyenv"><code>pyenv</code></a>.</summary>
 
 ```bash
 # install pyenv
@@ -22,15 +22,16 @@ export PATH="${HOME}/.pyenv/bin:${PATH}"
 export PYENV_ROOT="${HOME}/.pyenv"
 eval "$(pyenv init -)"
 
-# install Python 3.8
-pyenv install 3.8.10
+# install Python 3.10
+pyenv install 3.10
 
 # make it available globally
-pyenv global system 3.8.10
+pyenv global system 3.10
 ```
+
 </details>
 
-# Installation
+## Installation
 
 1. Create and activate a virtual environment.
 
@@ -47,6 +48,7 @@ pip install volttron
 # Start platform with output going to volttron.log
 volttron -vv -l volttron.log &
 ```
+
 3. Create a config directory and navigate to it:
 
 ```shell
@@ -370,6 +372,7 @@ Navigate to the config directory and create a file called `sysmonagent.config` a
 }
 
 ```
+
 </details>
 
 4. Install and start the sysmon agent
@@ -382,7 +385,7 @@ vctl install volttron-sysmon --agent-config sysmonagent.config --force --start
 
 To see data being published to the bus, install a [Listener Agent](https://pypi.org/project/volttron-listener/):
 
-```
+```bash
 vctl install volttron-listener --start
 ```
 
@@ -395,7 +398,7 @@ message content for each publish will contain only a single numeric value for th
 
 The following is an example of the LoadAverage publish captured by the Listener agent in the VOLTTRON log:
 
-```
+```log
 2024-01-02 12:03:50,435 (volttron-listener-0.2.0rc0 2404) listener.agent(104) INFO: Peer: pubsub, Sender: volttron-sysmon-0.1.0_1:, Bus: , Topic: datalogger/Log/Platform/CPU/LoadAverage, Headers: {'Date': '2024-01-02T20:03:50.426814+00:00', 'min_compatible_version': '3.0', 'max_compatible_version': ''}, Message:
 {'FifteenMinute': {'Readings': ['2024-01-02T20:03:50.426814+00:00',
                                 0.009765625],
@@ -419,7 +422,7 @@ The following is an example of the LoadAverage publish captured by the Listener 
 - memory_percent:  Returns current % system memory (RAM) utilization, takes no parameters
 - disk_percent:  Returns current % disk (ROM) utilization for the configured disk, takes no parameters
 
-# Disclaimer Notice
+## Disclaimer Notice
 
 This material was prepared as an account of work sponsored by an agency of the
 United States Government.  Neither the United States Government nor the United
