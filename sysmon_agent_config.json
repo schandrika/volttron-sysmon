@@ -100,7 +100,7 @@
         "disk_usage": {
             "point_name": "Disk/Usage",
             "check_interval": 3600,
-            "poll": false,
+            "poll": true,
             "params": {
                 "disk_path": ["/"],
                 "sub_points": {
