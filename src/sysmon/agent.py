@@ -57,7 +57,6 @@ __version__ = '4.0'
 
 
 # TODO: HANDLE THE VERSION DEPENDENCY FOR LOAD AVG
-# TODO: Update README.md to explain new style configuration format.
 class SysMonAgent(Agent):
     """Monitor utilization of system resources (CPU, memory, swap, disk, network)
 
@@ -513,18 +512,17 @@ class SysMonAgent(Agent):
         connections = self._process_statistics(connections,
                                                sub_points=sub_points,
                                                format_return=False)
-        if sys.version_info.major >= 3:    # TODO: Deprecated -- not an enum in Python < 3.4.
-            for k, v in connections.items():
-                if 'family' in v:
-                    v['family'] = v['family'].name
-                if 'type' in v:
-                    v['type'] = v['type'].name
-                if 'laddr' in v:
-                    v['laddr'] = v['laddr'].ip + ':' + str(v['laddr'].port) \
-                        if type(v['laddr']) is psutil._common.addr else ''
-                if 'raddr' in v:
-                    v['raddr'] = v['raddr'].ip + ':' + str(v['raddr'].port) \
-                        if type(v['raddr']) is psutil._common.addr else ''
+        for k, v in connections.items():
+            if 'family' in v:
+                v['family'] = v['family'].name
+            if 'type' in v:
+                v['type'] = v['type'].name
+            if 'laddr' in v:
+                v['laddr'] = v['laddr'].ip + ':' + str(v['laddr'].port) \
+                    if type(v['laddr']) is psutil._common.addr else ''
+            if 'raddr' in v:
+                v['raddr'] = v['raddr'].ip + ':' + str(v['raddr'].port) \
+                    if type(v['raddr']) is psutil._common.addr else ''
         connections = self._format_return(connections)
         return connections
 
