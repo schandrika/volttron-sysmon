@@ -417,7 +417,6 @@ The following is an example of the LoadAverage publish captured by the Listener 
                'tz': 'UTC'}}
 ```
 
-
 ### JSON RPC Methods
 
 - cpu_percent:  Returns current % all core CPU utilization, takes no parameters
