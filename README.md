@@ -1,7 +1,7 @@
 # volttron-sysmon
 
 The System Monitoring Agent (colloquially “SysMon”) can be installed on the platform to monitor system resource metrics,
-including percent CPU utilization, percent system memory (RAM) utilization, and percent storage (disk) utilization based
+including but not limited to percent CPU utilization, percent system memory (RAM) utilization, and percent storage (disk) utilization based
 on disk path.
 
 ## Requires
