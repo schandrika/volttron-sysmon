@@ -33,7 +33,7 @@ Besides `poll`, there are four other important options in sysmons configuration.
 - `point_name` changes the point name for the specific system monitor. In combination with publish_type and base_topic our data for cpu_precent would be published to volttron with a topic of: **datalogger/Log/Platform/CPU/Percent** using the below json as an example.
 - `check_interval` adjusts the time in seconds to poll for new system data. This can be modified for each system resource.
 
-Each system resource also has unique options, simply adjust false to true to enable these options.
+The Sysmon agent serves as a wrapper for psutil. You can adjust resource specific options by adjusting false to true in the configuration file. For detailed insights into these options and their impact, you can read the [psutil documentation](https://psutil.readthedocs.io/en/latest/)
 
 <details>
 <summary>JSON</summary>
