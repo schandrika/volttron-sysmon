@@ -418,10 +418,42 @@ The following is an example of the LoadAverage publish captured by the Listener 
 ```
 
 ### JSON RPC Methods
+For subpoints, please refer to the [psutil documentation](https://psutil.readthedocs.io/en/latest/).
 
-- cpu_percent:  Returns current % all core CPU utilization, takes no parameters
-- memory_percent:  Returns current % system memory (RAM) utilization, takes no parameters
-- disk_percent:  Returns current % disk (ROM) utilization for the configured disk, takes no parameters
+- cpu_percent:  Returns current CPU utilization percentage over a specified interval.
+    - per_cpu (bool): If True, returns utilization for each CPU core separately. If False, returns overall CPU utilization.
+    - capture_interval (float or None): Time in seconds over which to measure CPU usage.
+- cpu_times: Returns the percentage of time the CPU has spent in a given mode
+    - per_cpu (bool): If True, returns statistics for each CPU core separately. If False, returns overall statistics for all cores.
+    - [sub_points](https://psutil.readthedocs.io/en/latest/index.html#psutil.cpu_times)
+- cpu_times_percent: Returns the percentages of time the CPU has spent in different modes over a specified interval.
+    - per_cpu (bool): If True, returns statistics for each CPU core separately. If False, returns overall statistics for all cores.
+    - [sub_points](https://psutil.readthedocs.io/en/latest/index.html#psutil.cpu_times_percent)
+    - capture_interval (float or None): The time in seconds over which to measure CPU usage. If None, measures the instantaneous CPU usage since the last call or system start.
+- cpu_count: Return the number of CPU cores if logical=True or the number of physical CPUs if logical=False
+- cpu_stats: Return various CPU statistics.
+    - [sub_points](https://psutil.readthedocs.io/en/latest/index.html#psutil.cpu_stats)
+- cpu_frequency: Returns current frequency of the CPU cores.
+    - per_cpu (bool): If True, returns frequency information for each individual CPU core. If False, returns an overall view for the entire CPU.
+    - [sub_points](https://psutil.readthedocs.io/en/latest/index.html#psutil.cpu_freq)
+- memory: Return memory usage statistics.
+- swap: Return swap usage statistics.
+- disk_partitions: Returns information about disk partitions.
+- disk_percent: Returns usage of disk mounted at configured path.
+- disk_usage: Returns disk usage statistics.
+- load_average: Returns load averages.
+- path_usage: Returns storage used within a filesystem path.
+- path_usage_rate: Returns rate of change in storage used within a filesystem path in bytes per second.
+- disk_io: Returns disk input/output statistics.
+- network_io: Returns network input/output statistics.
+- network_connections: Return system-wide socket connections.
+- network_interface_addresses: Returns addresses associated with network interfaces.
+- network_interface_statistics: Returns information about each network interface.
+- sensors_temperatures: Returns hardware temperatures.
+- sensors_fans: Returns fan speed in RPM.
+- sensors_battery: Returns battery status information.
+- boot_time: Returns time of last system boot as seconds since the epoch.
+- users: Returns user session data for users currently connected to the system.
 
 ## Disclaimer Notice
 
