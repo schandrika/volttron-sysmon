@@ -4,59 +4,36 @@ The System Monitoring Agent (colloquially “SysMon”) can be installed on the 
 including percent CPU utilization, percent system memory (RAM) utilization, and percent storage (disk) utilization based
 on disk path.
 
-## Prerequisites
+## Requires
 
-* Python 3.10
-
-## Python
-
-<details>
-<summary>To install Python 3.10, we recommend using <a href="https://github.com/pyenv/pyenv"><code>pyenv</code></a>.</summary>
-
-```bash
-# install pyenv
-git clone https://github.com/pyenv/pyenv ~/.pyenv
-
-# setup pyenv (you should also put these three lines in .bashrc or similar)
-export PATH="${HOME}/.pyenv/bin:${PATH}"
-export PYENV_ROOT="${HOME}/.pyenv"
-eval "$(pyenv init -)"
-
-# install Python 3.10
-pyenv install 3.10
-
-# make it available globally
-pyenv global system 3.10
-```
-
-</details>
+* python >= 3.10
+* volttron >= 10.0
 
 ## Installation
 
-1. Create and activate a virtual environment.
+Before installing, VOLTTRON should be installed and running.  Its virtual environment should be active.
+Information on how to install of the VOLTTRON platform can be found
+[here](https://github.com/eclipse-volttron/volttron-core).
 
-```shell
-python -m venv env
-source env/bin/activate
-```
-
-2. Install volttron and start the platform.
-
-```shell
-pip install volttron
-
-# Start platform with output going to volttron.log
-volttron -vv -l volttron.log &
-```
-
-3. Create a config directory and navigate to it:
+Create a directory called `config` and use the change directory command to enter it.
 
 ```shell
 mkdir config
 cd config
 ```
 
-Navigate to the config directory and create a file called `sysmonagent.config` and add the following JSON to it:
+After entering the config directory, create a file named `sysmon_agent_config.json`, use the below JSON to populate your new file.
+
+For simplicity, copy all of the JSON and switch the key `"poll": false,` to `"poll": true,` for each system resource you want to monitor.
+
+Besides `poll`, there are four other important options in sysmons configuration.
+
+- `default_publish_type` only needs to be specified once in the configuration, this is the default publish type.
+- `base_topic` also only needs to be specified once. This is the base topic.
+- `point_name` changes the point name for the specific system monitor. In combination with publish_type and base_topic our data for cpu_precent would be published to volttron with a topic of: **datalogger/Log/Platform/CPU/Percent** using the below json as an example.
+- `check_interval` adjusts the time in seconds to poll for new system data. This can be modified for each system resource.
+
+Each system resource also has unique options, simply adjust false to true to enable these options.
 
 <details>
 <summary>JSON</summary>
@@ -178,7 +155,7 @@ Navigate to the config directory and create a file called `sysmonagent.config` a
         "load_average": {
             "point_name": "CPU/LoadAverage",
             "check_interval": 5,
-            "poll": true,
+            "poll": false,
             "params": {
                 "sub_points": {
                     "OneMinute": true,
@@ -374,14 +351,39 @@ Navigate to the config directory and create a file called `sysmonagent.config` a
 ```
 
 </details>
+You may also delete any unused fields if desired. For example, a configuration to monitor just cpu_precent could look like this.
 
-4. Install and start the sysmon agent
-
-```bash
-vctl install volttron-sysmon --agent-config sysmonagent.config --force --start
+```json
+{
+    "default_publish_type": "datalogger",
+    "base_topic": "Log/Platform",
+    "monitor": {
+        "cpu_percent": {
+            "point_name": "CPU/Percent",
+            "check_interval": 5,
+            "poll": false,
+            "params": {
+                "per_cpu": true,
+                "capture_interval": null
+            }
+        }
+    }
+}
 ```
 
-5. Observe Data
+Install and start the sysmon agent
+
+```bash
+vctl install volttron-sysmon --vip-identity agent.sysmon --force --start
+```
+
+Add `sysmon_agent_config.json` to the configuration store
+
+```bash
+vctl config store agent.sysmon config sysmon_agent_config.json
+```
+
+Observe Data
 
 To see data being published to the bus, install a [Listener Agent](https://pypi.org/project/volttron-listener/):
 
