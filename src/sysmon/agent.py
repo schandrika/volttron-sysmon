@@ -489,11 +489,10 @@ class SysMonAgent(Agent):
         """Return addresses associated with network interfaces."""
         addresses = psutil.net_if_addrs()
         addresses = self._process_statistics(addresses, sub_points, includes=included_interfaces, format_return=False)
-        if sys.version_info.major >= 3:    # TODO: Deprecated -- not an enum in Python < 3.4.
-            for k, v in addresses.items():
-                for item in v:
-                    if 'family' in item:
-                        item['family'] = item['family'].name
+        for k, v in addresses.items():
+            for item in v:
+                if 'family' in item:
+                    item['family'] = item['family'].name
         addresses = self._format_return(addresses)
         return addresses
 
@@ -502,11 +501,10 @@ class SysMonAgent(Agent):
         """Return information about each network interface."""
         stats = psutil.net_if_stats()
         stats = self._process_statistics(stats, sub_points, includes=included_interfaces, format_return=False)
-        if sys.version_info.major >= 3:    # TODO: Deprecated -- not an enum in Python < 3.4.
-            for k, v in stats.items():
-                if 'duplex' in v:
-                    v['duplex'] = v['duplex'].name
-            stats = self._format_return(stats)
+        for k, v in stats.items():
+            if 'duplex' in v:
+                v['duplex'] = v['duplex'].name
+        stats = self._format_return(stats)
         return stats
 
     # TODO: Currently marked record only publish, as psutil bug #1708 duplicates core temps.
