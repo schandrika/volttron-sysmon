@@ -1,43 +1,25 @@
 # -*- coding: utf-8 -*- {{{
-# vim: set fenc=utf-8 ft=python sw=4 ts=4 sts=4 et:
-
-# -*- coding: utf-8 -*- {{{
-# vim: set fenc=utf-8 ft=python sw=4 ts=4 sts=4 et:
+# ===----------------------------------------------------------------------===
 #
-# Copyright 2020, Battelle Memorial Institute.
+#                 Installable Component of Eclipse VOLTTRON
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# ===----------------------------------------------------------------------===
 #
-# http://www.apache.org/licenses/LICENSE-2.0
+# Copyright 2024 Battelle Memorial Institute
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License. You may obtain a copy
+# of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
 #
-# This material was prepared as an account of work sponsored by an agency of
-# the United States Government. Neither the United States Government nor the
-# United States Department of Energy, nor Battelle, nor any of their
-# employees, nor any jurisdiction or organization that has cooperated in the
-# development of these materials, makes any warranty, express or
-# implied, or assumes any legal liability or responsibility for the accuracy,
-# completeness, or usefulness or any information, apparatus, product,
-# software, or process disclosed, or represents that its use would not infringe
-# privately owned rights. Reference herein to any specific commercial product,
-# process, or service by trade name, trademark, manufacturer, or otherwise
-# does not necessarily constitute or imply its endorsement, recommendation, or
-# favoring by the United States Government or any agency thereof, or
-# Battelle Memorial Institute. The views and opinions of authors expressed
-# herein do not necessarily state or reflect those of the
-# United States Government or any agency thereof.
-#
-# PACIFIC NORTHWEST NATIONAL LABORATORY operated by
-# BATTELLE for the UNITED STATES DEPARTMENT OF ENERGY
-# under Contract DE-AC05-76RL01830
-# }}}
+# ===----------------------------------------------------------------------===
 # }}}
 
 import logging
@@ -67,16 +49,14 @@ class SysMonAgent(Agent):
     :type config: dict
     """
 
-    IMPLEMENTED_METHODS = ('cpu_percent', 'cpu_times', 'cpu_times_percent', 'cpu_statistics',
-                           'cpu_frequency', 'cpu_count', 'load_average', 'memory',
-                           'memory_percent', 'swap', 'disk_partitions', 'disk_usage',
-                           'disk_percent', 'disk_io', 'path_usage', 'path_usage_rate',
-                           'network_io', 'network_connections', 'network_interface_addresses',
-                           'network_interface_statistics', 'sensors_temperatures', 'sensors_fans',
-                           'sensors_battery', 'boot_time', 'users')
+    IMPLEMENTED_METHODS = ('cpu_percent', 'cpu_times', 'cpu_times_percent', 'cpu_statistics', 'cpu_frequency',
+                           'cpu_count', 'load_average', 'memory', 'memory_percent', 'swap', 'disk_partitions',
+                           'disk_usage', 'disk_percent', 'disk_io', 'path_usage', 'path_usage_rate', 'network_io',
+                           'network_connections', 'network_interface_addresses', 'network_interface_statistics',
+                           'sensors_temperatures', 'sensors_fans', 'sensors_battery', 'boot_time', 'users')
 
-    RECORD_ONLY_PUBLISH_METHODS = ('disk_partitions', 'network_connections',
-                                   'network_interface_address', 'sensors_temperatures', 'users')
+    RECORD_ONLY_PUBLISH_METHODS = ('disk_partitions', 'network_connections', 'network_interface_address',
+                                   'sensors_temperatures', 'users')
 
     UNITS = {
         'boot_time': 's',
@@ -186,15 +166,12 @@ class SysMonAgent(Agent):
 
         default_config = utils.load_config(config_path)
         self.vip.config.set_default('config', default_config)
-        self.vip.config.subscribe(self.on_reconfigure,
-                                  actions=['UPDATE', 'DELETE'],
-                                  pattern='_runtime_config')
+        self.vip.config.subscribe(self.on_reconfigure, actions=['UPDATE', 'DELETE'], pattern='_runtime_config')
         self.vip.config.subscribe(self.on_configure, actions=['NEW', 'UPDATE'], pattern='config')
 
     def on_configure(self, config_name, action, contents):
-        _log.info(
-            'Received configuration store event of type: {}. Loading configuration from config://{}'
-            .format(action, config_name))
+        _log.info('Received configuration store event of type: {}. Loading configuration from config://{}'.format(
+            action, config_name))
 
         # Stop any currently scheduled monitors.
         for sched in self._scheduled:
@@ -206,12 +183,11 @@ class SysMonAgent(Agent):
             self.base_topic = contents.pop('base_topic', 'Log/Platform')
         else:    # TODO: Deprecated configuration block. Make if block unconditional in future release:
             # BEGIN DEPRECATED CONFIGURATION BLOCK.
-            self.default_publish_type, self.base_topic = contents.pop(
-                'base_topic', 'datalogger/log/platform').split('/', 1)
-            _log.warning(
-                'No "default_publish_type" configuration found, using deprecated configuration method:'
-                'default_publish_type: "datalogger", base_topic: default_publish_type + "log/platform".'
-                'See SysMonAgent/README.md for information on new configuration format.')
+            self.default_publish_type, self.base_topic = contents.pop('base_topic',
+                                                                      'datalogger/log/platform').split('/', 1)
+            _log.warning('No "default_publish_type" configuration found, using deprecated configuration method:'
+                         'default_publish_type: "datalogger", base_topic: default_publish_type + "log/platform".'
+                         'See SysMonAgent/README.md for information on new configuration format.')
             # END DEPRECATED CONFIGURATION BLOCK.
 
         monitors = contents.pop('monitor', {})
@@ -222,22 +198,18 @@ class SysMonAgent(Agent):
                     ('disk_usage', 'disk_check_interval')]:
             deprecated_interval = contents.pop(dep[1], None)
             if monitors.get(dep[0]) and deprecated_interval:
-                _log.warning(
-                    'Ignoring deprecated configuration {}, using provided monitor["{}"]["check_interval"'
-                    'See SysMonAgent/README.md for information on new configuration format.'.
-                    format(dep[1], dep[0]))
+                _log.warning('Ignoring deprecated configuration {}, using provided monitor["{}"]["check_interval"'
+                             'See SysMonAgent/README.md for information on new configuration format.'.format(
+                                 dep[1], dep[0]))
             elif deprecated_interval:
                 monitors[dep[0]] = {'point_name': dep[0], 'check_interval': dep[1], 'poll': True}
-                _log.warning(
-                    'Starting cpu_percent monitor using deprecated configuration "cpu_check_interval".'
-                    ' Update configuration to use monitor["cpu_percent"]["check_interval"].'
-                    'See SysMonAgent/README.md for information on new configuration format.')
+                _log.warning('Starting cpu_percent monitor using deprecated configuration "cpu_check_interval".'
+                             ' Update configuration to use monitor["cpu_percent"]["check_interval"].'
+                             'See SysMonAgent/README.md for information on new configuration format.')
         # END DEPRECATED CONFIGURATION BLOCK.
 
         # Start Monitors:
-        sleep(
-            1
-        )    # Wait for a second to pass to avoid divide by zero errors from tracking variables.
+        sleep(1)    # Wait for a second to pass to avoid divide by zero errors from tracking variables.
         for method in self.IMPLEMENTED_METHODS:
             item = monitors.pop(method, None)
             if method == 'path_usage_rate' and item.get('path_name', None):
@@ -247,8 +219,8 @@ class SysMonAgent(Agent):
                 item_publish_type = item.get('publish_type', None)
                 item_publish_type = 'record' if method in self.RECORD_ONLY_PUBLISH_METHODS else item_publish_type
                 item_publish_type = item_publish_type if item_publish_type else self.default_publish_type
-                self._periodic_pub(getattr(self, method), item_publish_type,
-                                   item['check_interval'], item['point_name'], item['params'])
+                self._periodic_pub(getattr(self, method), item_publish_type, item['check_interval'], item['point_name'],
+                                   item['params'])
 
         for key in contents:
             _log.warning('Ignoring unrecognized configuration parameter %s', key)
@@ -285,12 +257,7 @@ class SysMonAgent(Agent):
             message = {}
             header = {'Date': now}
             for k, v in entries.items():
-                message[k] = {
-                    'Readings': [v.now, v.value],
-                    'Units': v.units,
-                    'tz': tz,
-                    'data_type': v.data_type
-                }
+                message[k] = {'Readings': [v.now, v.value], 'Units': v.units, 'tz': tz, 'data_type': v.data_type}
             self.vip.pubsub.publish(peer='pubsub',
                                     topic=publish_type + '/' + self.base_topic + '/' + point_base,
                                     headers=header,
@@ -331,8 +298,8 @@ class SysMonAgent(Agent):
         self._scheduled.append(sched)
 
     def on_reconfigure(self, config_name, action, contents):
-        _log.info('Received configuration store event of type: {}. Reconfiguring from config://{}'.
-                  format(action, config_name))
+        _log.info('Received configuration store event of type: {}. Reconfiguring from config://{}'.format(
+            action, config_name))
         # TODO: Write runtime reconfiguration'
         pass
 
@@ -401,9 +368,7 @@ class SysMonAgent(Agent):
     def disk_partitions(self, all_partitions=False, included_partitions=None, sub_points=None):
         """Returns information about disk partitions"""
         partitions = psutil.disk_partitions(all_partitions)
-        partitions = self._process_statistics(partitions,
-                                              sub_points=sub_points,
-                                              includes=included_partitions)
+        partitions = self._process_statistics(partitions, sub_points=sub_points, includes=included_partitions)
         return partitions
 
     @RPC.export('disk_percent')
@@ -442,12 +407,9 @@ class SysMonAgent(Agent):
                     path_size[path_n] = path.getsize(path_n)
                 elif path.isdir(path_n):
                     if not access(path_n, R_OK):
-                        raise PermissionError(
-                            'Inaccessible path: path_n. Check read permissions and that path exists.'
-                        )
+                        raise PermissionError('Inaccessible path: path_n. Check read permissions and that path exists.')
                     path_size[path_n] = sum(
-                        path.getsize(path.join(dir_path, filename))
-                        for dir_path, dir_names, filenames in walk(path_n)
+                        path.getsize(path.join(dir_path, filename)) for dir_path, dir_names, filenames in walk(path_n)
                         for filename in filenames)
                 else:
                     raise Exception('Path is neither a file nor a directory: {}'.format(path_n))
@@ -486,9 +448,8 @@ class SysMonAgent(Agent):
             per_disk = True
         io_stats = psutil.disk_io_counters(perdisk=per_disk, nowrap=no_wrap)
         retval = self._process_statistics(io_stats, sub_points, includes=included_disks)
-        self._get_throughput(io_stats, retval, per_disk, sub_points, 'read_throughput',
-                             'write_throughput', 'read_bytes', 'write_bytes',
-                             self.last_disk_read_bytes, self.last_disk_write_bytes)
+        self._get_throughput(io_stats, retval, per_disk, sub_points, 'read_throughput', 'write_throughput',
+                             'read_bytes', 'write_bytes', self.last_disk_read_bytes, self.last_disk_write_bytes)
         retval = self._format_return(retval)
         return retval
 
@@ -499,9 +460,8 @@ class SysMonAgent(Agent):
             per_nic = True
         io_stats = psutil.net_io_counters(pernic=per_nic, nowrap=no_wrap)
         retval = self._process_statistics(io_stats, sub_points, includes=included_nics)
-        self._get_throughput(io_stats, retval, per_nic, sub_points, 'receive_throughput',
-                             'send_throughput', 'bytes_recv', 'bytes_sent',
-                             self.last_network_received_bytes, self.last_network_sent_bytes)
+        self._get_throughput(io_stats, retval, per_nic, sub_points, 'receive_throughput', 'send_throughput',
+                             'bytes_recv', 'bytes_sent', self.last_network_received_bytes, self.last_network_sent_bytes)
         retval = self._format_return(retval)
         return retval
 
@@ -509,9 +469,7 @@ class SysMonAgent(Agent):
     def network_connections(self, kind='inet', sub_points=None):
         """Return system-wide socket connections"""
         connections = psutil.net_connections(kind)
-        connections = self._process_statistics(connections,
-                                               sub_points=sub_points,
-                                               format_return=False)
+        connections = self._process_statistics(connections, sub_points=sub_points, format_return=False)
         for k, v in connections.items():
             if 'family' in v:
                 v['family'] = v['family'].name
@@ -530,10 +488,7 @@ class SysMonAgent(Agent):
     def network_interface_addresses(self, included_interfaces=None, sub_points=None):
         """Return addresses associated with network interfaces."""
         addresses = psutil.net_if_addrs()
-        addresses = self._process_statistics(addresses,
-                                             sub_points,
-                                             includes=included_interfaces,
-                                             format_return=False)
+        addresses = self._process_statistics(addresses, sub_points, includes=included_interfaces, format_return=False)
         if sys.version_info.major >= 3:    # TODO: Deprecated -- not an enum in Python < 3.4.
             for k, v in addresses.items():
                 for item in v:
@@ -546,10 +501,7 @@ class SysMonAgent(Agent):
     def network_interface_statistics(self, included_interfaces=None, sub_points=None):
         """Return information about each network interface."""
         stats = psutil.net_if_stats()
-        stats = self._process_statistics(stats,
-                                         sub_points,
-                                         includes=included_interfaces,
-                                         format_return=False)
+        stats = self._process_statistics(stats, sub_points, includes=included_interfaces, format_return=False)
         if sys.version_info.major >= 3:    # TODO: Deprecated -- not an enum in Python < 3.4.
             for k, v in stats.items():
                 if 'duplex' in v:
@@ -632,8 +584,8 @@ class SysMonAgent(Agent):
         keys = list(stats.keys())
         # TODO: This leads to odd behavior for disk_partitions, where if only 0 is requested it has a different output
         #  format than if only 1 is requested.
-        if len(keys) == 1 and keys[
-                0] == 0:    # TODO: Do we care if it is an enumerated list or do this for single dicts?
+        if len(keys
+               ) == 1 and keys[0] == 0:    # TODO: Do we care if it is an enumerated list or do this for single dicts?
             stats = stats[0]    # TODO: Does this need another [0] at the end?
         return stats
 
@@ -644,48 +596,28 @@ class SysMonAgent(Agent):
         elif type(sub_points) is str:
             return {key: value for (key, value) in item._asdict().items() if key == sub_points}
         elif type(sub_points) is dict:
-            return {
-                key: value
-                for (key, value) in item._asdict().items() if sub_points.get(key, False) is True
-            }
+            return {key: value for (key, value) in item._asdict().items() if sub_points.get(key, False) is True}
         else:
             return {key: value for (key, value) in item._asdict().items()}
 
     # TODO: The tracking variables for this should us a look back buffer, not just last value as currently used.
     @staticmethod
-    def _get_throughput(io_stats, retval, per_device, sub_points, in_ret_label, out_ret_label,
-                        in_label, out_label, last_in, last_out):
+    def _get_throughput(io_stats, retval, per_device, sub_points, in_ret_label, out_ret_label, in_label, out_label,
+                        last_in, last_out):
         now = utils.get_aware_utc_now()
         current_in_bytes = {}
         current_out_bytes = {}
         if per_device is False:
-            current_in_bytes = {
-                'not_per_device': {
-                    'value': getattr(io_stats, in_label),
-                    'dt': now
-                }
-            }
-            current_out_bytes = {
-                'not_per_device': {
-                    'value': getattr(io_stats, out_label),
-                    'dt': now
-                }
-            }
+            current_in_bytes = {'not_per_device': {'value': getattr(io_stats, in_label), 'dt': now}}
+            current_out_bytes = {'not_per_device': {'value': getattr(io_stats, out_label), 'dt': now}}
         else:
             for device in io_stats:
-                current_in_bytes[device] = {
-                    'value': getattr(io_stats[device], in_label),
-                    'dt': now
-                }
-                current_out_bytes[device] = {
-                    'value': getattr(io_stats[device], out_label),
-                    'dt': now
-                }
+                current_in_bytes[device] = {'value': getattr(io_stats[device], in_label), 'dt': now}
+                current_out_bytes[device] = {'value': getattr(io_stats[device], out_label), 'dt': now}
 
         for device, in_bytes in current_in_bytes.items():
             if device in last_in:
-                throughput = (in_bytes['value'] -
-                              last_in[device]['value']) / (now - last_in[device]['dt']).seconds
+                throughput = (in_bytes['value'] - last_in[device]['value']) / (now - last_in[device]['dt']).seconds
             else:
                 throughput = -2
             if not sub_points or in_ret_label in sub_points:
@@ -696,8 +628,7 @@ class SysMonAgent(Agent):
         last_in.update(current_in_bytes)
         for device, out_bytes in current_out_bytes.items():
             if device in last_out:
-                throughput = (out_bytes['value'] -
-                              last_out[device]['value']) / (now - last_out[device]['dt']).seconds
+                throughput = (out_bytes['value'] - last_out[device]['value']) / (now - last_out[device]['dt']).seconds
             else:
                 throughput = -2
             if not sub_points or out_ret_label in sub_points:
