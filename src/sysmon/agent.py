@@ -37,8 +37,6 @@ utils.setup_logging()
 _log = logging.getLogger(__name__)
 __version__ = '4.0'
 
-
-# TODO: HANDLE THE VERSION DEPENDENCY FOR LOAD AVG
 class SysMonAgent(Agent):
     """Monitor utilization of system resources (CPU, memory, swap, disk, network)
 
@@ -166,7 +164,6 @@ class SysMonAgent(Agent):
 
         default_config = utils.load_config(config_path)
         self.vip.config.set_default('config', default_config)
-        self.vip.config.subscribe(self.on_reconfigure, actions=['UPDATE', 'DELETE'], pattern='_runtime_config')
         self.vip.config.subscribe(self.on_configure, actions=['NEW', 'UPDATE'], pattern='config')
 
     def on_configure(self, config_name, action, contents):
@@ -296,12 +293,6 @@ class SysMonAgent(Agent):
 
         sched = self.core.schedule(periodic(check_interval), pub_wrapper, params)
         self._scheduled.append(sched)
-
-    def on_reconfigure(self, config_name, action, contents):
-        _log.info('Received configuration store event of type: {}. Reconfiguring from config://{}'.format(
-            action, config_name))
-        # TODO: Write runtime reconfiguration'
-        pass
 
     @RPC.export('cpu_percent')
     def cpu_percent(self, per_cpu=False, capture_interval=None):
