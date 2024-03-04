@@ -24,7 +24,7 @@ cd config
 
 After entering the config directory, create a file named `sysmon_agent_config.json`, use the below JSON to populate your new file.
 
-For simplicity, copy all of the JSON and switch the key `"poll": false,` to `"poll": true,` for each system resource you want to monitor.
+For simplicity, copy all of the JSON from [here](sysmon_agent_config.json) and switch the key `"poll": false,` to `"poll": true,` for each system resource you want to monitor.
 
 Besides `poll`, there are four other important options in sysmons configuration.
 
@@ -35,9 +35,6 @@ Besides `poll`, there are four other important options in sysmons configuration.
 
 The Sysmon agent serves as a wrapper for psutil. You can adjust resource specific options by adjusting false to true in the configuration file. For detailed insights into these options and their impact, you can read the [psutil documentation](https://psutil.readthedocs.io/en/latest/)
 
-A full configuration file can be found [here](sysmon_agent_config.json)
-
-</details>
 You may also delete any unused fields if desired. For example, a configuration to monitor just cpu_precent could look like this.
 
 ```json
