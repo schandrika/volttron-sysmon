@@ -28,6 +28,7 @@ Configuration
 -------------
 
 You can find the full configuration with all system monitors in place here: https://github.com/eclipse-volttron/volttron-sysmon/sysmon_agent_config.json
+for simplicity, you can copy this entire file and set ``poll`` to ``true`` for each system you want to monitor. 
 
 Besides ``poll``, there are four other important options in sysmons configuration.
 
@@ -37,9 +38,6 @@ Besides ``poll``, there are four other important options in sysmons configuratio
 - ``check_interval`` adjusts the time in seconds to poll for new system data. This can be modified for each system resource.
 
 The Sysmon agent serves as a wrapper for psutil. You can adjust resource specific options by adjusting false to true in the configuration file. For detailed insights into these options and their impact, you can read the `psutil documentation <https://psutil.readthedocs.io/en/latest/>`_.
-
-A full configuration file can be found `here <sysmon_agent_config.json>`_.
-
 
 JSON RPC Methods
 ----------------
