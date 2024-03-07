@@ -498,14 +498,32 @@ class SysMonAgent(Agent):
         stats = self._format_return(stats)
         return stats
 
-    # TODO: Currently marked record only publish, as psutil bug #1708 duplicates core temps.
-    # TODO: Change list into dict of label names, pending resolution of psutil bug #1708 if labels become unique.
     @RPC.export('sensors_temperatures')
-    def sensors_temperatures(self, fahrenheit=False, sub_points=None, included_sensors=None):
+    def sensors_temperatures(self, fahrenheit=False):
         """Return hardware temperatures."""
-        temps = psutil.sensors_temperatures(fahrenheit)
-        temps = self._process_statistics(temps, sub_points, includes=included_sensors)
-        return temps
+        temps = psutil.sensors_temperatures(fahrenheit=fahrenheit)
+        
+        if not temps:
+            return "No hardware to read"
+
+        formatted_temps = {}
+        for sensor_type, readings in temps.items():
+            formatted_readings = []
+            for reading in readings:
+                # Use the sensor label if available, otherwise, use the sensor type as the label
+                label = reading.label if reading.label else sensor_type
+                
+                unit = 'F' if fahrenheit else 'C'
+                current_temperature = f"{reading.current}°{unit}"
+
+                formatted_readings.append({
+                    'label': label,
+                    'current': current_temperature,
+                })
+            formatted_temps[sensor_type] = formatted_readings
+
+        return formatted_temps
+
 
     @RPC.export('sensors_fans')
     def sensors_fans(self, sub_points=None, included_sensors=None):
@@ -532,13 +550,6 @@ class SysMonAgent(Agent):
         users = psutil.users()
         users = self._process_statistics(users, sub_points)
         return users
-
-    @RPC.export('reconfigure')
-    def reconfigure(self, **kwargs):
-        """Reconfigure the agent"""
-        # self._configure(kwargs)
-        # self._restart()  # TODO: Rewrite reconfigure method.
-        pass
 
     def _process_statistics(self, stats, sub_points, includes=None, format_return=True):
         if type(stats).__bases__[0] == tuple:    # Case: stats is a named tuple.
