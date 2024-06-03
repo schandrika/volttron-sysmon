@@ -58,7 +58,7 @@ You may also delete any unused fields if desired. For example, a configuration t
 Install and start the sysmon agent
 
 ```bash
-vctl install volttron-sysmon --vip-identity agent.sysmon --force --start
+vctl install volttron-sysmon --vip-identity agent.sysmon --start
 ```
 
 Add `sysmon_agent_config.json` to the configuration store
