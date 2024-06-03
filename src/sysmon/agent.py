@@ -167,8 +167,7 @@ class SysMonAgent(Agent):
         self.vip.config.subscribe(self.on_configure, actions=['NEW', 'UPDATE'], pattern='config')
 
     def on_configure(self, config_name, action, contents):
-        _log.info('Received configuration store event of type: {}. Loading configuration from config://{}'.format(
-            action, config_name))
+        _log.info(f'Received configuration store event of type: {action}. Loading configuration from config://{config_name}')
 
         # Stop any currently scheduled monitors.
         for sched in self._scheduled:
@@ -195,9 +194,10 @@ class SysMonAgent(Agent):
                     ('disk_usage', 'disk_check_interval')]:
             deprecated_interval = contents.pop(dep[1], None)
             if monitors.get(dep[0]) and deprecated_interval:
-                _log.warning('Ignoring deprecated configuration {}, using provided monitor["{}"]["check_interval"'
-                             'See SysMonAgent/README.md for information on new configuration format.'.format(
-                                 dep[1], dep[0]))
+                _log.warning(
+                    f"Ignoring deprecated configuration {dep[1]}, using provided monitor['{dep[0]}']['check_interval']"
+                    "See SysMonAgent/README.md for information on new configuration format.")
+
             elif deprecated_interval:
                 monitors[dep[0]] = {'point_name': dep[0], 'check_interval': dep[1], 'poll': True}
                 _log.warning('Starting cpu_percent monitor using deprecated configuration "cpu_check_interval".'
@@ -222,7 +222,7 @@ class SysMonAgent(Agent):
         for key in contents:
             _log.warning('Ignoring unrecognized configuration parameter %s', key)
         for key in monitors:
-            _log.warning('Ignoring unimplemented monitor method: {}'.format(key))
+            _log.warning(f'Ignoring unimplemented monitor method: {key}')
 
     def _periodic_pub(self, func, publish_type, check_interval, point_name, params):
         """Periodically call func and publish its return value"""
@@ -240,7 +240,7 @@ class SysMonAgent(Agent):
                 for k, v in item.items():
                     entries = _unpack(topic + '/' + str(k), v, now, entries)
             else:
-                _log.warning('Unexpected return type from method: {}'.format(func.__name__))
+                _log.warning(f'Unexpected return type from method: {func.__name__}')
             return entries
 
         def _datalogger_publish(parameters):
@@ -403,9 +403,9 @@ class SysMonAgent(Agent):
                         path.getsize(path.join(dir_path, filename)) for dir_path, dir_names, filenames in walk(path_n)
                         for filename in filenames)
                 else:
-                    raise Exception('Path is neither a file nor a directory: {}'.format(path_n))
+                    raise Exception(f'Path is neither a file nor a directory: {path_n}')
             except Exception as e:
-                _log.error('Exception in path_usage: {}'.format(e))
+                _log.error(f'Exception in path_usage: {e}')
                 path_size[path_n] = -1    # Error code -1 indicates path exception.
         return path_size
 
