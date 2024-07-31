@@ -26,7 +26,7 @@
 
 # -- Project information
 
-project = 'VOLTTRON Log Statistics Agent'
+project = 'VOLTTRON Sysmon Agent'
 copyright = '2024, Pacific Northwest National Lab'
 author = 'Pacific Northwest National Lab'
 
