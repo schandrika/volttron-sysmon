@@ -1,108 +1,106 @@
-.. _volttron-sysmon:
-===============
 volttron-sysmon
 ===============
 
 The System Monitoring Agent (colloquially “SysMon”) can be installed on the platform to monitor system resource metrics, including but not limited to percent CPU utilization, percent system memory (RAM) utilization, and percent storage (disk) utilization based on disk path.
 
-.. _volttron-sysmon:
-Configuration and Installation
-==============================
-
 Requires
 --------
 
-- python >= 3.10
-- volttron >= 10.0
+* python >= 3.10
+* volttron >= 10.0
 
 Installation
 ------------
 
-The Sysmon agent can be installed using vctl:
+Before installing, VOLTTRON should be installed and running. Its virtual environment should be active. Information on how to install the VOLTTRON platform can be found `here <https://github.com/eclipse-volttron/volttron-core>`_.
 
-.. code-block:: bash
+Create a directory called ``config`` and use the change directory command to enter it.
 
-    vctl install volttron-sysmon --vip-identity agent.sysmon --force --start
+.. code-block:: shell
 
-Configuration
--------------
+    mkdir config
+    cd config
 
-You can find the full configuration with all system monitors in place here: https://github.com/eclipse-volttron/volttron-sysmon/sysmon_agent_config.json
-for simplicity, you can copy this entire file and set ``poll`` to ``true`` for each system you want to monitor. 
+After entering the config directory, create a file named ``sysmon_agent_config.json``, use the below JSON to populate your new file.
 
-Besides ``poll``, there are four other important options in sysmons configuration.
+For simplicity, copy all of the JSON from `sysmon_config <sysmon_agent_config.json>`_ and switch the key ``"poll": false,`` to ``"poll": true,`` for each system resource you want to monitor.
+
+Besides ``poll``, there are four other important options in sysmon's configuration.
 
 - ``default_publish_type`` only needs to be specified once in the configuration, this is the default publish type.
 - ``base_topic`` also only needs to be specified once. This is the base topic.
-- ``point_name`` changes the point name for the specific system monitor. In combination with publish_type and base_topic our data for cpu_precent would be published to volttron with a topic of: **datalogger/Log/Platform/CPU/Percent** using the below json as an example.
+- ``point_name`` changes the point name for the specific system monitor. In combination with publish_type and base_topic, our data for cpu_percent would be published to volttron with a topic of: **datalogger/Log/Platform/CPU/Percent** using the below JSON as an example.
 - ``check_interval`` adjusts the time in seconds to poll for new system data. This can be modified for each system resource.
 
 The Sysmon agent serves as a wrapper for psutil. You can adjust resource specific options by adjusting false to true in the configuration file. For detailed insights into these options and their impact, you can read the `psutil documentation <https://psutil.readthedocs.io/en/latest/>`_.
 
-JSON RPC Methods
-----------------
+You may also delete any unused fields if desired. For example, a configuration to monitor just cpu_percent could look like this.
 
-For subpoints, please refer to the `psutil documentation <https://psutil.readthedocs.io/en/latest/>`_.
+.. code-block:: json
 
-- **cpu_percent**:  Returns current CPU utilization percentage over a specified interval.
-  
-  - *per_cpu* (bool): If True, returns utilization for each CPU core separately. If False, returns overall CPU utilization.
-  - *capture_interval* (float or None): Time in seconds over which to measure CPU usage.
+    {
+        "default_publish_type": "datalogger",
+        "base_topic": "Log/Platform",
+        "monitor": {
+            "cpu_percent": {
+                "point_name": "CPU/Percent",
+                "check_interval": 5,
+                "poll": false,
+                "params": {
+                    "per_cpu": true,
+                    "capture_interval": null
+                }
+            }
+        }
+    }
 
-- **cpu_times**: Returns the percentage of time the CPU has spent in a given mode
-  
-  - *per_cpu* (bool): If True, returns statistics for each CPU core separately. If False, returns overall statistics for all cores.
-  - `sub_points <https://psutil.readthedocs.io/en/latest/index.html#psutil.cpu_times>`
+Install and start the sysmon agent
 
-- **cpu_times_percent**: Returns the percentages of time the CPU has spent in different modes over a specified interval.
-  
-  - *per_cpu* (bool): If True, returns statistics for each CPU core separately. If False, returns overall statistics for all cores.
-  - `sub_points <https://psutil.readthedocs.io/en/latest/index.html#psutil.cpu_times_percent>`
-  - *capture_interval* (float or None): The time in seconds over which to measure CPU usage. If None, measures the instantaneous CPU usage since the last call or system start.
+.. code-block:: bash
 
-- **cpu_count**: Return the number of CPU cores if logical=True or the number of physical CPUs if logical=False
+    vctl install volttron-sysmon --vip-identity agent.sysmon --start
 
-- **cpu_stats**: Return various CPU statistics.
-  
-  - `sub_points <https://psutil.readthedocs.io/en/latest/index.html#psutil.cpu_stats>`
+Add ``sysmon_agent_config.json`` to the configuration store
 
-- **cpu_frequency**: Returns current frequency of the CPU cores.
-  
-  - *per_cpu* (bool): If True, returns frequency information for each individual CPU core. If False, returns an overall view for the entire CPU.
-  - `sub_points <https://psutil.readthedocs.io/en/latest/index.html#psutil.cpu_freq>`
+.. code-block:: bash
 
-- **memory**: Return memory usage statistics.
+    vctl config store agent.sysmon config sysmon_agent_config.json
 
-- **swap**: Return swap usage statistics.
+Observe Data
+------------
 
-- **disk_partitions**: Returns information about disk partitions.
+To see data being published to the bus, install a `Listener Agent <https://pypi.org/project/volttron-listener/>`_:
 
-- **disk_percent**: Returns usage of disk mounted at configured path.
+.. code-block:: bash
 
-- **disk_usage**: Returns disk usage statistics.
+    vctl install volttron-listener --start
 
-- **load_average**: Returns load averages.
+### Periodic Publish
 
-- **path_usage**: Returns storage used within a filesystem path.
+At the interval specified by the configuration option for each resource, the agent will automatically query the system for the resource utilization statistics and publish it to the message bus using the topic as previously described. The message content for each publish will contain only a single numeric value for that specific topic. Currently, “scrape_all” style publishes are not supported.
 
-- **path_usage_rate**: Returns rate of change in storage used within a filesystem path in bytes per second.
+The following is an example of the LoadAverage publish captured by the Listener agent in the VOLTTRON log:
 
-- **disk_io**: Returns disk input/output statistics.
+.. code-block:: none
 
-- **network_io**: Returns network input/output statistics.
+    2024-01-02 12:03:50,435 (volttron-listener-0.2.0rc0 2404) listener.agent(104) INFO: Peer: pubsub, Sender: volttron-sysmon-0.1.0_1:, Bus: , Topic: datalogger/Log/Platform/CPU/LoadAverage, Headers: {'Date': '2024-01-02T20:03:50.426814+00:00', 'min_compatible_version': '3.0', 'max_compatible_version': ''}, Message:
+    {'FifteenMinute': {'Readings': ['2024-01-02T20:03:50.426814+00:00',
+                                    0.009765625],
+                       'Units': 'load_average',
+                       'data_type': 'float',
+                       'tz': 'UTC'},
+     'FiveMinute': {'Readings': ['2024-01-02T20:03:50.426814+00:00', 0.05517578125],
+                    'Units': 'load_average',
+                    'data_type': 'float',
+                    'tz': 'UTC'},
+     'OneMinute': {'Readings': ['2024-01-02T20:03:50.426814+00:00', 0.14404296875],
+                   'Units': 'load_average',
+                   'data_type': 'float',
+                   'tz': 'UTC'}}
 
-- **network_connections**: Return system-wide socket connections.
+Disclaimer Notice
+-----------------
 
-- **network_interface_addresses**: Returns addresses associated with network interfaces.
+This material was prepared as an account of work sponsored by an agency of the United States Government. Neither the United States Government nor the United States Department of Energy, nor Battelle, nor any of their employees, nor any jurisdiction or organization that has cooperated in the development of these materials, makes any warranty, express or implied, or assumes any legal liability or responsibility for the accuracy, completeness, or usefulness or any information, apparatus, product, software, or process disclosed, or represents that its use would not infringe privately owned rights.
 
-- **network_interface_statistics**: Returns information about each network interface.
-
-- **sensors_temperatures**: Returns hardware temperatures.
-
-- **sensors_fans**: Returns fan speed in RPM.
-
-- **sensors_battery**: Returns battery status information.
-
-- **boot_time**: Returns time of last system boot as seconds since the epoch.
-
-- **users**: Returns user session data for users currently connected to the system.
+Reference herein to any specific commercial product, process, or service by trade name, trademark, manufacturer, or otherwise does not necessarily constitute or imply its endorsement, recommendation, or favoring by the United States Government or any agency thereof, or Battelle Memorial Institute. The views and opinions of authors expressed herein do not necessarily state or reflect those of the United States Government or any agency thereof.
