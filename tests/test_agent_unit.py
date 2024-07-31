@@ -24,6 +24,8 @@
 
 import pytest
 import gevent
+import os
+from pathlib import Path
 
 from volttron.client.known_identities import PLATFORM_DRIVER
 from volttrontesting.platformwrapper import PlatformWrapper
@@ -57,7 +59,7 @@ def publish_agent(volttron_instance: PlatformWrapper):
             }
         }
     }
-    puid = vi.install_agent(agent_dir=".",
+    puid = vi.install_agent(agent_dir=str(Path(__file__).parent.parent.resolve()),
                             config_file=config,
                             start=False,
                             vip_identity="agent.sysmon")
