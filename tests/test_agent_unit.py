@@ -57,7 +57,7 @@ def publish_agent(volttron_instance: PlatformWrapper):
             }
         }
     }
-    puid = vi.install_agent(agent_dir="volttron-sysmon",
+    puid = vi.install_agent(agent_dir=".",
                             config_file=config,
                             start=False,
                             vip_identity="agent.sysmon")
