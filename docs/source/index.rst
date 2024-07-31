@@ -386,7 +386,8 @@ To see data being published to the bus, install a `Listener Agent <https://pypi.
 
     vctl install volttron-listener --start
 
-### Periodic Publish
+Periodic Publish
+----------------
 
 At the interval specified by the configuration option for each resource, the agent will automatically query the system for the resource utilization statistics and publish it to the message bus using the topic as previously described. The message content for each publish will contain only a single numeric value for that specific topic. Currently, “scrape_all” style publishes are not supported.
 
